@@ -3,7 +3,22 @@ import { createClient } from '@/lib/supabase/server'
 import { generateSignedUrl, deleteStorageAsset } from '@/lib/storage'
 import { vtoGenerateSchema } from '@/lib/validators'
 import { generateVTO, VTOError } from '@/lib/vto/fashn'
-import type { VTOResult } from '@/lib/types'
+import type { VTOResult, GarmentCategory } from '@/lib/types'
+import type { VTOCategory } from '@/lib/vto/fashn'
+
+// Map garment categories to VTO categories
+function mapToVTOCategory(category: GarmentCategory): VTOCategory {
+  switch (category) {
+    case 'Bottom':
+      return 'lower_body'
+    case 'Dress':
+      return 'full_body'
+    case 'Top':
+    case 'Outerwear':
+    default:
+      return 'upper_body'
+  }
+}
 
 export async function POST(request: Request) {
   // 1. Auth
@@ -49,10 +64,10 @@ export async function POST(request: Request) {
 
   const { garment_id, source_photo_path } = parsed.data
 
-  // 4. Fetch garment to get image_path (also validates ownership via RLS)
+  // 4. Fetch garment to get image_path AND category (also validates ownership via RLS)
   const { data: garment, error: garmentError } = await supabase
     .from('garments')
-    .select('image_path')
+    .select('image_path, category')
     .eq('id', garment_id)
     .eq('user_id', user.id)
     .single()
@@ -83,13 +98,15 @@ export async function POST(request: Request) {
     )
   }
 
-  // 6. Call IDM-VTON via Hugging Face Spaces
+  // 6. Determine VTO category and call appropriate model
+  const vtoCategory = mapToVTOCategory(garment.category as GarmentCategory)
   let resultUrl: string
   let generationMs: number
   try {
     ;({ resultUrl, generationMs } = await generateVTO(
       modelSignedUrl,
       garmentSignedUrl,
+      vtoCategory,
     ))
   } catch (err) {
     console.error('VTO generation error:', err)
@@ -134,6 +151,7 @@ export async function POST(request: Request) {
   }
 
   // 9. Insert vto_results row
+  const apiProvider = vtoCategory === 'upper_body' ? 'idm-vton' : 'catvton'
   const { data: vtoResult, error: dbError } = await supabase
     .from('vto_results')
     .insert({
@@ -141,7 +159,7 @@ export async function POST(request: Request) {
       garment_id,
       source_photo_path,
       result_path: resultPath,
-      api_provider: 'idm-vton',
+      api_provider: apiProvider,
       generation_ms: generationMs,
     })
     .select()
@@ -149,7 +167,6 @@ export async function POST(request: Request) {
 
   if (dbError || !vtoResult) {
     console.error('DB insert error:', dbError)
-    // Best-effort cleanup of uploaded result
     try {
       await deleteStorageAsset('vto-results', resultPath)
     } catch {

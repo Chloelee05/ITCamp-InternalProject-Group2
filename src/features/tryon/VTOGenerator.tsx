@@ -17,7 +17,7 @@ import type { Garment, GarmentCategory } from '@/lib/types'
 // Constants
 // ---------------------------------------------------------------------------
 
-const VTO_CATEGORIES: GarmentCategory[] = ['Top', 'Dress', 'Outerwear']
+const VTO_CATEGORIES: GarmentCategory[] = ['Top', 'Bottom', 'Dress', 'Outerwear']
 const MAX_REFERENCE_PHOTOS = 2
 const PROGRESS_MESSAGES = [
   'Uploading...',
@@ -391,7 +391,7 @@ export function VTOGenerator({ onSuccess }: VTOGeneratorProps) {
         <h2 id="vto-step1-heading" className="text-sm font-semibold text-foreground mb-1">
           1. Choose garments
         </h2>
-        <p className="text-xs text-muted mb-3">Tops, dresses, and outerwear · select multiple</p>
+        <p className="text-xs text-muted mb-3">Tops, bottoms, dresses, and outerwear · select multiple</p>
 
         {/* Category filter chips */}
         <div className="flex gap-2 mb-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
