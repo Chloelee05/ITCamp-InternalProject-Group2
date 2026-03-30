@@ -74,7 +74,7 @@ export default function VTOGalleryPage() {
 
         {/* Results list */}
         {!isLoading && !isError && results && results.length > 0 && (
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {results.map((result) => (
               <VTOResultCard key={result.id} result={result} />
             ))}
