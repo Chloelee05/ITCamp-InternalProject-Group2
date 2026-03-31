@@ -623,14 +623,12 @@ export default function UploadPage() {
                   className="object-contain"
                   unoptimized
                 />
-                {/* Bounding box overlays */}
+               {/* Bounding box overlays — draggable & resizable */}
                 {detectedItems.map((item, i) => (
-                  <button
+                  <div
                     key={i}
-                    type="button"
-                    onClick={() => toggleDetectedItem(i)}
                     className={[
-                      'absolute border-2 rounded transition-all',
+                      'absolute border-2 rounded cursor-move select-none',
                       item.selected
                         ? 'border-brand bg-brand/10'
                         : 'border-muted/40 bg-black/10 opacity-50',
@@ -640,18 +638,82 @@ export default function UploadPage() {
                       top: `${item.bbox.y * 100}%`,
                       width: `${item.bbox.width * 100}%`,
                       height: `${item.bbox.height * 100}%`,
+                      touchAction: 'none',
                     }}
-                    aria-label={`${item.selected ? 'Deselect' : 'Select'} ${item.label}`}
+                    onPointerDown={(e) => {
+                      if ((e.target as HTMLElement).dataset.resize) return
+                      e.preventDefault()
+                      e.stopPropagation()
+                      const container = (e.currentTarget.parentElement as HTMLElement)
+                      const rect = container.getBoundingClientRect()
+                      const startX = e.clientX
+                      const startY = e.clientY
+                      const origBbox = { ...item.bbox }
+
+                      function onMove(ev: PointerEvent) {
+                        const dx = (ev.clientX - startX) / rect.width
+                        const dy = (ev.clientY - startY) / rect.height
+                        const newX = Math.max(0, Math.min(1 - origBbox.width, origBbox.x + dx))
+                        const newY = Math.max(0, Math.min(1 - origBbox.height, origBbox.y + dy))
+                        setDetectedItems(prev => prev.map((it, idx) =>
+                          idx === i ? { ...it, bbox: { ...it.bbox, x: newX, y: newY } } : it
+                        ))
+                      }
+                      function onUp() {
+                        window.removeEventListener('pointermove', onMove)
+                        window.removeEventListener('pointerup', onUp)
+                      }
+                      window.addEventListener('pointermove', onMove)
+                      window.addEventListener('pointerup', onUp)
+                    }}
                   >
-                    <span className={[
-                      'absolute -top-5 left-0 text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap',
-                      item.selected ? 'bg-brand text-brand-foreground' : 'bg-muted/60 text-foreground',
-                    ].join(' ')}>
+                    {/* Label */}
+                    <span
+                      className={[
+                        'absolute -top-5 left-0 text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap cursor-pointer',
+                        item.selected ? 'bg-brand text-brand-foreground' : 'bg-muted/60 text-foreground',
+                      ].join(' ')}
+                      onClick={() => toggleDetectedItem(i)}
+                    >
                       {i + 1}. {item.label}
                     </span>
-                  </button>
+                    {/* Toggle select on tap */}
+                    <div
+                      className="absolute inset-0"
+                      onDoubleClick={() => toggleDetectedItem(i)}
+                    />
+                    {/* Resize handle — bottom right corner */}
+                    <div
+                      data-resize="true"
+                      className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-brand rounded-full cursor-nwse-resize border-2 border-white shadow"
+                      onPointerDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        const container = (e.currentTarget.parentElement?.parentElement as HTMLElement)
+                        const rect = container.getBoundingClientRect()
+                        const startX = e.clientX
+                        const startY = e.clientY
+                        const origBbox = { ...item.bbox }
+
+                        function onMove(ev: PointerEvent) {
+                          const dx = (ev.clientX - startX) / rect.width
+                          const dy = (ev.clientY - startY) / rect.height
+                          const newW = Math.max(0.05, Math.min(1 - origBbox.x, origBbox.width + dx))
+                          const newH = Math.max(0.05, Math.min(1 - origBbox.y, origBbox.height + dy))
+                          setDetectedItems(prev => prev.map((it, idx) =>
+                            idx === i ? { ...it, bbox: { ...it.bbox, width: newW, height: newH } } : it
+                          ))
+                        }
+                        function onUp() {
+                          window.removeEventListener('pointermove', onMove)
+                          window.removeEventListener('pointerup', onUp)
+                        }
+                        window.addEventListener('pointermove', onMove)
+                        window.addEventListener('pointerup', onUp)
+                      }}
+                    />
+                  </div>
                 ))}
-              </div>
 
               {/* Item list */}
               <div className="space-y-2">
