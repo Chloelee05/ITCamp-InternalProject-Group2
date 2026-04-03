@@ -99,8 +99,8 @@ async function generateWithOpenAI(
   formData.append('size', '1024x1024')
   formData.append('quality', 'medium')
 
-  const personBlob = new Blob([personBuffer], { type: 'image/png' })
-  const garmentBlob = new Blob([garmentBuffer], { type: 'image/png' })
+  const personBlob = new Blob([new Uint8Array(personBuffer)], { type: 'image/png' })
+  const garmentBlob = new Blob([new Uint8Array(garmentBuffer)], { type: 'image/png' })
   formData.append('image[]', personBlob, 'person.png')
   formData.append('image[]', garmentBlob, 'garment.png')
 
