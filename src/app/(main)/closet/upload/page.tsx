@@ -714,6 +714,7 @@ export default function UploadPage() {
                     />
                   </div>
                 ))}
+              </div>
 
               {/* Item list */}
               <div className="space-y-2">
