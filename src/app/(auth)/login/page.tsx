@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
+  // const [googleLoading, setGoogleLoading] = useState(false)
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -37,23 +37,23 @@ export default function LoginPage() {
     }
   }
   //BROKEN need set up google cloud console
-  async function handleGoogleLogin() {
-    setError(null)
-    setGoogleLoading(true)
-    try {
-      const supabase = createClient()
-      const { error: authError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-      if (authError) throw authError
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google sign in failed. Please try again.')
-      setGoogleLoading(false)
-    }
-  }
+  // async function handleGoogleLogin() {
+  //   setError(null)
+  //   setGoogleLoading(true)
+  //   try {
+  //     const supabase = createClient()
+  //     const { error: authError } = await supabase.auth.signInWithOAuth({
+  //       provider: 'google',
+  //       options: {
+  //         redirectTo: `${window.location.origin}/auth/callback`,
+  //       },
+  //     })
+  //     if (authError) throw authError
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : 'Google sign in failed. Please try again.')
+  //     setGoogleLoading(false)
+  //   }
+  // }
 
   return (
     <>
@@ -134,7 +134,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <button
+      {/* <button
         onClick={handleGoogleLogin}
         disabled={googleLoading}
         className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg border border-border bg-background text-foreground text-sm font-medium hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition"
@@ -172,7 +172,7 @@ export default function LoginPage() {
           </svg>
         )}
         Continue with Google
-      </button>
+      </button> */}
 
       <p className="mt-6 text-center text-sm text-muted">
         No account?{' '}

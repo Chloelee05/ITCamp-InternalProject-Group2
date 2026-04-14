@@ -12,9 +12,9 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
+  // const [googleLoading, setGoogleLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
-  const [devMode, setDevMode] = useState(false)
+  // const [devMode, setDevMode] = useState(false)
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
@@ -36,26 +36,26 @@ export default function RegisterPage() {
       if (sanitizedPassword.length < 8) {
         throw new Error('Password must be at least 8 characters')
       }
-      if (devMode) {
-        // Dev mode: server uses service role to create user with email pre-confirmed
-        const res = await fetch('/api/dev/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: sanitizedEmail,
-            password: sanitizedPassword,
-            display_name: sanitizedName,
-          }),
-        })
-        const json = (await res.json()) as { error?: string }
-        if (!res.ok) throw new Error(json.error ?? 'Registration failed')
-        // Sign in immediately since email is already confirmed
-        const supabase = createClient()
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-        if (signInError) throw signInError
-        router.push('/closet')
-        router.refresh()
-      } else {
+      // if (devMode) {
+      //   // Dev mode: server uses service role to create user with email pre-confirmed
+      //   const res = await fetch('/api/dev/register', {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({
+      //       email: sanitizedEmail,
+      //       password: sanitizedPassword,
+      //       display_name: sanitizedName,
+      //     }),
+      //   })
+      //   const json = (await res.json()) as { error?: string }
+      //   if (!res.ok) throw new Error(json.error ?? 'Registration failed')
+      //   // Sign in immediately since email is already confirmed
+      //   const supabase = createClient()
+      //   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      //   if (signInError) throw signInError
+      //   router.push('/closet')
+      //   router.refresh()}
+      else {
         const supabase = createClient()
         const { data, error: authError } = await supabase.auth.signUp({
           email: sanitizedEmail,
@@ -77,24 +77,24 @@ export default function RegisterPage() {
       setLoading(false)
     }
   }
-  //BROKEN Need to set up google cloud
-  async function handleGoogleLogin() {
-    setError(null)
-    setGoogleLoading(true)
-    try {
-      const supabase = createClient()
-      const { error: authError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-      if (authError) throw authError
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google sign in failed. Please try again.')
-      setGoogleLoading(false)
-    }
-  }
+  // //BROKEN Need to set up google cloud
+  // async function handleGoogleLogin() {
+  //   setError(null)
+  //   setGoogleLoading(true)
+  //   try {
+  //     const supabase = createClient()
+  //     const { error: authError } = await supabase.auth.signInWithOAuth({
+  //       provider: 'google',
+  //       options: {
+  //         redirectTo: `${window.location.origin}/auth/callback`,
+  //       },
+  //     })
+  //     if (authError) throw authError
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : 'Google sign in failed. Please try again.')
+  //     setGoogleLoading(false)
+  //   }
+  // }
 
   if (emailSent) {
     return (
@@ -188,7 +188,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <label className="flex items-center gap-2 cursor-pointer select-none">
+        {/* <label className="flex items-center gap-2 cursor-pointer select-none">
           <button
             type="button"
             role="switch"
@@ -204,7 +204,7 @@ export default function RegisterPage() {
             Dev mode{' '}
             <span className="text-amber-600 dark:text-amber-400">(skip email confirmation)</span>
           </span>
-        </label>
+        </label> */}
 
         <button
           type="submit"
@@ -232,16 +232,16 @@ export default function RegisterPage() {
         </button>
       </form>
 
-      <div className="relative my-5">
+      {/* <div className="relative my-5">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs text-muted">
           <span className="bg-surface px-2">or</span>
         </div>
-      </div>
+      </div> */}
 
-      <button
+      {/* <button
         onClick={handleGoogleLogin}
         disabled={googleLoading}
         className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg border border-border bg-background text-foreground text-sm font-medium hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition"
@@ -279,7 +279,7 @@ export default function RegisterPage() {
           </svg>
         )}
         Continue with Google
-      </button>
+      </button> */}
 
       <p className="mt-6 text-center text-sm text-muted">
         Already have an account?{' '}
