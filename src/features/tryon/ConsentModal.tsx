@@ -78,16 +78,15 @@ export function ConsentModal({ isOpen, onConsent }: ConsentModalProps) {
         {/* Explanation */}
         <div className="space-y-3 text-sm text-foreground/80">
           <p>
-            Virtual Try-On lets you see how any garment looks on you using AI. To generate a
-            try-on, this feature needs to send your reference photo to{' '}
-            <strong className="text-foreground">Fashn.ai</strong>, a third-party AI service.
+            Virtual Try-On lets you see how any garment looks on you using AI. To generate a try-on,
+            this feature needs to send your reference photo to a third-party AI service.
           </p>
 
           <p>Here&apos;s what happens with your data:</p>
 
           <ul className="space-y-2 pl-1">
             {[
-              'Your reference photo is transmitted to Fashn.ai to generate the try-on composite.',
+              'Your reference photo is transmitted to our third-party AI to generate the try-on composite.',
               'The generated result image is stored in your private Supabase Storage — only you can access it.',
               'Your reference photo is also stored privately and used only for try-on generation.',
               'You can delete any result and its associated photos at any time.',
@@ -109,14 +108,18 @@ export function ConsentModal({ isOpen, onConsent }: ConsentModalProps) {
           </ul>
 
           <p className="text-xs text-muted">
-            By enabling Try-On you consent to your reference photo being processed by Fashn.ai in
-            accordance with their privacy policy. You can withdraw consent at any time in Settings.
+            By enabling Try-On you consent to your reference photo being processed by our
+            third-party AI in accordance with their privacy policy. You can withdraw consent at any
+            time in Settings.
           </p>
         </div>
 
         {/* Error */}
         {error && (
-          <p role="alert" className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 rounded-lg px-3 py-2">
+          <p
+            role="alert"
+            className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 rounded-lg px-3 py-2"
+          >
             {error}
           </p>
         )}
